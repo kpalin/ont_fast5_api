@@ -13,10 +13,12 @@ def get_fast5_file_list(input_path, recursive):
     if os.path.isfile(input_path):
         return [input_path]
     if recursive:
-        file_list = [y for x in os.walk(input_path, followlinks=True)
-                     for y in glob(os.path.join(x[0], '*.fast5'))]
+        file_list = [os.path.join(x[0],y) for x in os.walk(input_path, followlinks=True)
+                     for y in x[2] if y.endswith('.fast5')]
     else:
         file_list = [i for i in glob(os.path.join(input_path, '*.fast5'))]
+
+    print("Found {} files.".format(len(file_list)))
     return file_list
 
 

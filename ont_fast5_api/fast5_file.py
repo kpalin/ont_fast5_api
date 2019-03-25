@@ -747,7 +747,13 @@ class Fast5File(AbstractFast5File):
         return data
 
     def _initialise_file(self):
-        if self.mode in ['w', 'w-', 'x']:
+        if self.mode == 'r': # For read-only files, copy the file to (hopefully) faster storage
+            from tempfile import NamedTemporaryFile
+            from shutil import copyfile
+            self._readonly_file_obj = NamedTemporaryFile()
+            copyfile(self.filename,self._readonly_file_obj.name)
+            self.filename = self._readonly_file_obj.name
+        elif self.mode in ['w', 'w-', 'x']:
             with h5py.File(self.filename, self.mode) as fh:
                 fh.attrs['file_version'] = CURRENT_FAST5_VERSION
                 fh.create_group('Analyses')
